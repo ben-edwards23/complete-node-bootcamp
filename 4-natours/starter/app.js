@@ -1,13 +1,20 @@
 const express = require('express');
 const fs = require('fs');
+const morgan = require('morgan');
+
 const app = express();
 const PORT = 3000 || process.env.PORT;
+
 let tourData = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
+
+// MIDDLEWARE
+app.use(morgan('dev'));
 app.use(express.json());
 
-app.get('/api/v1/tours', (req, res) => {
+// ROUTES
+const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
     count: tourData.length,
@@ -15,7 +22,9 @@ app.get('/api/v1/tours', (req, res) => {
       tours: tourData,
     },
   });
-});
+};
+
+app.get('/api/v1/tours', getAllTours);
 
 app.get('/api/v1/tours/:id', (req, res) => {
   const tourId = Number(req.params.id);
@@ -35,6 +44,8 @@ app.get('/api/v1/tours/:id', (req, res) => {
     });
   esl;
 });
+
+app.patch('/api/v1/tours/:id', (req, res) => {});
 
 app.post('/api/v1/tours', (req, res) => {
   // Work out the last ID and increment by 1
